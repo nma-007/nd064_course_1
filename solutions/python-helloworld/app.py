@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import json
 import logging
-
+from time import gmtime, strftime
 app = Flask(__name__)
 
 @app.route('/status')
@@ -18,8 +18,21 @@ def healthcheck():
 @app.route('/metrics')
 def metrics():
     response = app.response_class(
-            response=json.dumps({"status":"success","code":0,"data":{"UserCount":140,"UserCountActive":23}}),
+            response=json.dumps({"status":"success!"
+			,"code":0,"data":{"UserCount":140,"UserCountActive":23}}),
             status=200,
+            mimetype='application/json'
+    )
+
+    app.logger.info('Metrics request successfull')
+    return response
+
+
+@app.route('/error')
+def error():
+    response = app.response_class(
+            response=json.dumps({"status":"Error!"}),
+            status=501,
             mimetype='application/json'
     )
 
@@ -34,6 +47,6 @@ def hello():
 
 if __name__ == "__main__":
     ## stream logs to a file
-    logging.basicConfig(filename='app.log',level=logging.DEBUG)
+    logging.basicConfig(filename='app.log',level=logging.DEBUG, datefmt=strftime("%a, %d %b %Y %H:%M:%S"))
     
     app.run(host='0.0.0.0')
